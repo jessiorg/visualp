@@ -1,9 +1,11 @@
 # visualp
 
-Private source and documentation archive for the P1 / PCO lifecycle prototype: visual people, visual companies, sovereign pulse, dispatch, economics, and reinvestment architecture.
+Private source and documentation archive for the P1 / PCO lifecycle prototype: virtual people, virtual companies, Sovereign Pulse, Dispatch, economics, and reinvestment architecture.
+
+For autonomous agents and coding assistants, read [AGENT_README.md](AGENT_README.md) first.
 
 ## Documentation
-All documentation is under lowercase `docs/` to avoid case-sensitive filesystem ambiguity.
+All documentation is under lowercase `docs/`.
 
 - [Documentation index](docs/README.md)
 - [Chronological script](docs/chronological-script.md)
