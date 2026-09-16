@@ -1,0 +1,1 @@
+{"name":"visualp-prototype","private":true,"type":"module","scripts":{"dev":"nuxt dev","build":"nuxt build","start":"node .output/server/index.mjs","generate":"nuxt generate"},"dependencies":{"@nuxtjs/tailwindcss":"^6.12.1","nuxt":"^3.13.2","vue":"^3.5.0"}}

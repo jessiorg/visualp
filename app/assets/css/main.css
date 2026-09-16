@@ -1,0 +1,2 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+:root{font-family:ui-sans-serif,system-ui,sans-serif}*{box-sizing:border-box}button{transition:all .2s ease}

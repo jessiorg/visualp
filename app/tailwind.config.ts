@@ -1,0 +1,1 @@
+export default { content: ['./components/**/*.{vue,js,ts}', './pages/**/*.vue', './app.vue'], theme: { extend: { colors: { ink: '#14211f', mint: '#d9f4e8', lime: '#baf26d', coral: '#ff806c' } } }, plugins: [] }
