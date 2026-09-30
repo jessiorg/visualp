@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digital replicas · visualp</title>
+  <link rel="stylesheet" href="design-system.css" />
+</head>
+<body>
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+      <a href="index.html" class="logo">visualp<span class="dot">·</span></a>
+      <nav>
+        <a href="company.html">Company</a>
+        <a href="business-activities.html">Money</a>
+        <a href="sovereign-pulse.html">Pulse</a>
+        <a href="dispatch.html">Dispatch</a>
+        <a href="digital-replicas.html" aria-current="page">Replicas</a>
+        <a href="taxonomy.html">Taxonomy</a>
+      </nav>
+      <span class="pill"><span class="stage-chip replica" style="border:0;background:transparent;padding:0;color:inherit;font-size:11px;"><span class="dot"></span>Replica pattern</span></span>
+    </div>
+  </header>
+
+  <main id="content">
+
+    <!-- HERO -->
+    <section class="section hero" data-od-id="hero">
+      <div class="container">
+        <div class="page-meta">
+          <a href="index.html">visualp</a>
+          <span>·</span>
+          <span>Page 05 · Digital replicas</span>
+        </div>
+        <div style="margin-top: 32px;">
+          <p class="eyebrow">DIGITAL REPLICA · THE PATTERN</p>
+          <h1>Same shape, different business.</h1>
+          <p class="lead" style="margin-top: 20px;">A digital replica is a bounded scenario built from the same Pulse + Dispatch grammar. Sim-Refinery, Sim-LAES, and any new venture follow the same template: state surface, action surface, settlement evidence, and a scrubbable scenario timeline.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE REPLICA TEMPLATE -->
+    <section class="section" data-od-id="template">
+      <div class="container">
+        <div style="max-width: 36ch;">
+          <p class="eyebrow">REPLICA TEMPLATE · FOUR SURFACES</p>
+          <h2>Every replica exposes the same four surfaces.</h2>
+          <p class="lead" style="margin-top: 16px;">The grammar is fixed. The numbers, asset classes, and counterparty maps change per replica.</p>
+        </div>
+
+        <div class="grid-4" style="margin-top: 40px;">
+          <div class="card card-flat">
+            <p class="eyebrow-muted">01 · PULSE</p>
+            <h3 class="h3">State surface</h3>
+            <p class="muted" style="margin-top: 8px;">Live balance sheet, survival floor, FCF ticker, CCE trend.</p>
+          </div>
+          <div class="card card-flat">
+            <p class="eyebrow-muted">02 · DISPATCH</p>
+            <h3 class="h3">Action surface</h3>
+            <p class="muted" style="margin-top: 8px;">Missions, agents, approval queue, wholesale blocks.</p>
+          </div>
+          <div class="card card-flat">
+            <p class="eyebrow-muted">03 · EVIDENCE</p>
+            <h3 class="h3">Settlement record</h3>
+            <p class="muted" style="margin-top: 8px;">Counterparty, amount, timestamp, evidence artefacts.</p>
+          </div>
+          <div class="card card-flat">
+            <p class="eyebrow-muted">04 · TIMELINE</p>
+            <h3 class="h3">Scenario scrubber</h3>
+            <p class="muted" style="margin-top: 8px;">Bounded scenario with play / pause / scrub. Evidence flows in order.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCRUBBER DEMO (LAES) -->
+    <section class="section" data-od-id="sim-laes">
+      <div class="container">
+        <div class="row-between" style="margin-bottom: 24px;">
+          <span class="stage-chip replica"><span class="dot"></span>Sim-LAES · working capital</span>
+          <span class="meta">Scenario 03 of 07 · Q3 working capital stress</span>
+        </div>
+
+        <div class="scrubber">
+          <button class="play-btn" aria-label="Play / pause scenario">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div>
+            <p class="eyebrow-muted" style="margin-bottom: 8px;">SCENARIO POSITION</p>
+            <div class="scrub-track">
+              <div class="scrub-fill"></div>
+            </div>
+          </div>
+          <span class="scrub-label">T − 11 d / 26 d</span>
+        </div>
+
+        <div class="grid-2" style="margin-top: 40px;">
+          <div class="surface-panel pulse">
+            <p class="surface-meta">PULSE · SIM-LAES</p>
+            <h3>Working capital scenario</h3>
+            <p class="muted" style="margin-top: 8px;">Cash on hand under a 30-day delayed settlement from counterparty LAES Ltd.</p>
+            <div class="kv" style="margin-top: 20px;"><span class="k">Cash on hand</span><span class="v num">£84,200</span></div>
+            <div class="kv"><span class="k">Outstanding AR (LAES)</span><span class="v num">£38,400</span></div>
+            <div class="kv"><span class="k">Survival floor (60 d)</span><span class="v num">£22,800</span></div>
+            <div class="kv"><span class="k">Days of runway at AR delay</span><span class="v num accent">142 d</span></div>
+            <div class="kv"><span class="k">Trigger band</span><span class="v">90 d runway</span></div>
+          </div>
+
+          <div class="surface-panel dispatch">
+            <p class="surface-meta">DISPATCH · SIM-LAES</p>
+            <h3>What we can do about it</h3>
+            <p class="muted" style="margin-top: 8px;">Bounded missions available to widen the runway before the trigger band.</p>
+            <div class="queue" style="margin-top: 20px;">
+              <div class="queue-item" style="padding-top: 0; border-top: 0;">
+                <span class="q-id">L-12</span>
+                <div class="q-body">
+                  <h4>Bridge financing · invoice discounting</h4>
+                  <p>Discount LAES AR at 2.4% for 60-day bridge.</p>
+                </div>
+                <span class="q-amount">£36,500</span>
+                <span class="q-state">Available</span>
+              </div>
+              <div class="queue-item">
+                <span class="q-id">L-13</span>
+                <div class="q-body">
+                  <h4>Counterparty X substitution</h4>
+                  <p>Reallocate Q3 procurement to a faster-paying supplier.</p>
+                </div>
+                <span class="q-amount">£12,800</span>
+                <span class="q-state">Available</span>
+              </div>
+              <div class="queue-item">
+                <span class="q-id">L-14</span>
+                <div class="q-body">
+                  <h4>Settlement renegotiation</h4>
+                  <p>Negotiate net-30 terms with LAES Ltd.</p>
+                </div>
+                <span class="q-amount">—</span>
+                <span class="q-state hold">Human-led</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+          <p class="eyebrow-muted">SCENARIO TIMELINE · 26 DAYS</p>
+          <div class="timeline" style="margin-top: 18px;">
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick now"></div>
+            <div class="tick"></div>
+          </div>
+          <div class="tick-meta">
+            <span>T − 26 d · Counterparty stress signal</span>
+            <span>Now · T − 11 d · Mission L-12 ready</span>
+            <span>T + 15 d · Trigger band</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCRUBBER DEMO (REFINERY) -->
+    <section class="section" data-od-id="sim-refinery">
+      <div class="container">
+        <div class="row-between" style="margin-bottom: 24px;">
+          <span class="stage-chip replica"><span class="dot"></span>Sim-Refinery · cashflow</span>
+          <span class="meta">Scenario 05 of 12 · feedstock margin compression</span>
+        </div>
+
+        <div class="scrubber">
+          <button class="play-btn" aria-label="Play / pause scenario">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+          </button>
+          <div>
+            <p class="eyebrow-muted" style="margin-bottom: 8px;">SCENARIO POSITION · PAUSED</p>
+            <div class="scrub-track">
+              <div class="scrub-fill" style="width: 64%;"></div>
+            </div>
+          </div>
+          <span class="scrub-label">T − 18 d / 28 d</span>
+        </div>
+
+        <div class="grid-2" style="margin-top: 40px;">
+          <div class="surface-panel pulse">
+            <p class="surface-meta">PULSE · SIM-REFINERY</p>
+            <h3>Cashflow under margin compression</h3>
+            <p class="muted" style="margin-top: 8px;">Feedstock cost +18% over 6 weeks; output price held flat under contract.</p>
+            <div class="kv" style="margin-top: 20px;"><span class="k">Feedstock cost / bbl</span><span class="v num">$84.20</span></div>
+            <div class="kv"><span class="k">Output price / bbl</span><span class="v num">$92.00</span></div>
+            <div class="kv"><span class="k">Gross margin / bbl</span><span class="v num accent">$7.80</span></div>
+            <div class="kv"><span class="k">Margin Δ vs. base</span><span class="v num delta-bad">−62%</span></div>
+            <div class="kv"><span class="k">FCF (TTM)</span><span class="v num">£1,420</span></div>
+            <div class="kv"><span class="k">CCE</span><span class="v num delta-warn">74%</span></div>
+          </div>
+
+          <div class="surface-panel dispatch">
+            <p class="surface-meta">DISPATCH · SIM-REFINERY</p>
+            <h3>Active missions</h3>
+            <p class="muted" style="margin-top: 8px;">Three missions in flight. One above the autonomous limit.</p>
+            <div class="queue" style="margin-top: 20px;">
+              <div class="queue-item" style="padding-top: 0; border-top: 0;">
+                <span class="q-id">R-22</span>
+                <div class="q-body">
+                  <h4>Wholesale feedstock re-procurement</h4>
+                  <p>Aggregate 4 sites into a single monthly feedstock contract.</p>
+                </div>
+                <span class="q-amount">£118,000</span>
+                <span class="q-state approve">Approval</span>
+              </div>
+              <div class="queue-item">
+                <span class="q-id">R-23</span>
+                <div class="q-body">
+                  <h4>Output price renegotiation</h4>
+                  <p>Reopen Q4 contract — held price +9% to recover margin.</p>
+                </div>
+                <span class="q-amount">—</span>
+                <span class="q-state hold">Human-led</span>
+              </div>
+              <div class="queue-item">
+                <span class="q-id">R-24</span>
+                <div class="q-body">
+                  <h4>Treasury sweep · idle cash</h4>
+                  <p>Sweep £24k above survival floor into 30-day T-bill.</p>
+                </div>
+                <span class="q-amount">£24,000</span>
+                <span class="q-state">Auto</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+          <p class="eyebrow-muted">SCENARIO TIMELINE · 28 DAYS</p>
+          <div class="timeline" style="margin-top: 18px;">
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick now"></div>
+            <div class="tick"></div>
+            <div class="tick"></div>
+            <div class="tick"></div>
+            <div class="tick"></div>
+          </div>
+          <div class="tick-meta">
+            <span>T − 28 d · Margin signal</span>
+            <span>Now · T − 18 d · Mission R-22 ready</span>
+            <span>T + 10 d · Decision window</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPLICA REGISTRY -->
+    <section class="section" data-od-id="registry">
+      <div class="container">
+        <div style="max-width: 36ch;">
+          <p class="eyebrow">REPLICA REGISTRY</p>
+          <h2>Replicas in flight or planned.</h2>
+          <p class="lead" style="margin-top: 16px;">Each row is one bounded business scenario. Scenarios build into ventures when evidence clears.</p>
+        </div>
+
+        <table class="ds-table" style="margin-top: 32px;">
+          <thead>
+            <tr>
+              <th>Replica</th>
+              <th>Subject</th>
+              <th>Pattern</th>
+              <th class="num-col">Scenarios</th>
+              <th class="num-col">Status</th>
+              <th>Tier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Sim-LAES</strong></td>
+              <td>Liquid Air Energy Storage · working capital</td>
+              <td>AR delay · bridge finance · renegotiation</td>
+              <td class="num-col">7</td>
+              <td class="num-col">Active</td>
+              <td>1 · 7</td>
+            </tr>
+            <tr>
+              <td><strong>Sim-Refinery</strong></td>
+              <td>Fable Refinery · cashflow under margin compression</td>
+              <td>Feedstock aggregation · price renegotiation</td>
+              <td class="num-col">12</td>
+              <td class="num-col">Active</td>
+              <td>5 · 1</td>
+            </tr>
+            <tr>
+              <td><strong>Sim-Biomethane</strong></td>
+              <td>Feedstock contract · reinvestment entry</td>
+              <td>Wholesale aggregation · ROCE gate</td>
+              <td class="num-col">5</td>
+              <td class="num-col">Active</td>
+              <td>5 · 7</td>
+            </tr>
+            <tr>
+              <td><strong>Sim-Hydro</strong></td>
+              <td>Baseload internal supply</td>
+              <td>LCOE displacement · spot procurement</td>
+              <td class="num-col">3</td>
+              <td class="num-col">Active</td>
+              <td>1 · 7</td>
+            </tr>
+            <tr>
+              <td><strong>Sim-Nutrition</strong></td>
+              <td>Wholesale staples · P1 aggregation</td>
+              <td>Block procurement · COGS reduction</td>
+              <td class="num-col">4</td>
+              <td class="num-col">Planning</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td><strong>Sim-Freight</strong></td>
+              <td>Aggregated freight contracts</td>
+              <td>PCO site consolidation</td>
+              <td class="num-col">2</td>
+              <td class="num-col">Planning</td>
+              <td>6</td>
+            </tr>
+            <tr>
+              <td><strong>Sim-Treasury</strong></td>
+              <td>Yield sweep · DuckDB · Nostr · x402</td>
+              <td>Survival-floor excess · 30-day T-bill</td>
+              <td class="num-col">2</td>
+              <td class="num-col">Active</td>
+              <td>7</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CONNECTING LIVE DATA -->
+    <section class="section" data-od-id="connect">
+      <div class="container">
+        <div class="grid-2">
+          <div class="card card-dark">
+            <p class="eyebrow-muted" style="color: var(--accent);">NEXT · LIVE DATA</p>
+            <h3 class="h2">Replica shell today. Live replica when data arrives.</h3>
+            <p class="muted" style="margin-top: 12px; color: color-mix(in oklch, var(--bg) 70%, transparent); max-width: 40ch;">Once the Kanay dataset registries and classification system plug in, every replica's scrubber becomes a real timeline and every KPI becomes a live read. The shape is the contract; the data fills it.</p>
+            <div class="hero-cta" style="margin-top: 28px;">
+              <a class="btn btn-primary" href="taxonomy.html">Read the taxonomy</a>
+              <a class="btn btn-ghost btn-arrow" href="business-activities.html" style="color: var(--bg);">Money grammar</a>
+            </div>
+          </div>
+          <div class="card">
+            <p class="eyebrow-muted">WHAT THE LIVE REPLICA WILL RECEIVE</p>
+            <ul class="meta" style="padding-left: 0; list-style: none; margin-top: 20px; line-height: 2;">
+              <li>→ Kanay classification (tier + ISIC + GICS code)</li>
+              <li>→ Dataset registries (counterparties, contracts, evidence)</li>
+              <li>→ Settlement feeds (net-30 / net-60 / quarterly)</li>
+              <li>→ Compute-floor telemetry (Hetzner EX44 utilisation)</li>
+              <li>→ Wholesale block aggregation queues</li>
+              <li>→ Reinvestment policy &amp; ROCE gates</li>
+              <li>→ Evidence artefacts (counterparty ack · delivery · POD)</li>
+              <li>→ Audit log &amp; escalation rules</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pagefoot" data-od-id="footer">
+    <div class="container row-between">
+      <span>© visualp · page 05 · digital replicas</span>
+      <span class="meta"><a href="dispatch.html">← Dispatch</a> · <a href="taxonomy.html">Next → Taxonomy</a></span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dispatch · visualp</title>
+  <link rel="stylesheet" href="design-system.css" />
+</head>
+<body>
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+      <a href="index.html" class="logo">visualp<span class="dot">·</span></a>
+      <nav>
+        <a href="company.html">Company</a>
+        <a href="business-activities.html">Money</a>
+        <a href="sovereign-pulse.html">Pulse</a>
+        <a href="dispatch.html" aria-current="page">Dispatch</a>
+        <a href="digital-replicas.html">Replicas</a>
+        <a href="taxonomy.html">Taxonomy</a>
+      </nav>
+      <span class="pill"><span class="stage-chip dispatch" style="border:0;background:transparent;padding:0;color:inherit;font-size:11px;"><span class="dot"></span>Action surface</span></span>
+    </div>
+  </header>
+
+  <main id="content">
+
+    <!-- HERO -->
+    <section class="section hero" data-od-id="hero">
+      <div class="container">
+        <div class="page-meta">
+          <a href="index.html">visualp</a>
+          <span>·</span>
+          <span>Page 04 · Dispatch</span>
+        </div>
+        <div style="margin-top: 32px;">
+          <p class="eyebrow">SURFACE B · ACTION</p>
+          <h1>What changes next.</h1>
+          <p class="lead" style="margin-top: 20px;">The execution cockpit. Agents propose missions; humans approve what crosses the spending limit; settlement evidence writes back to Pulse. Autonomy is bounded by permissions, escalation rules, and audit logs.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOP STATUS STRIP -->
+    <section class="section" data-od-id="status">
+      <div class="container">
+        <div class="row-between" style="margin-bottom: 32px;">
+          <span class="stage-chip dispatch"><span class="dot"></span>Mission cycle · T-00:00:18</span>
+          <span class="meta">7 active · 2 pending approval · 4/4 evidenced (24 h)</span>
+        </div>
+
+        <div class="grid-4">
+          <div class="stat">
+            <div class="stat-num num">7</div>
+            <p class="stat-label">Active missions in flight.</p>
+          </div>
+          <div class="stat">
+            <div class="stat-num num">2</div>
+            <p class="stat-label">Awaiting human approval.</p>
+          </div>
+          <div class="stat">
+            <div class="stat-num num">1</div>
+            <p class="stat-label">Wholesale block open for aggregation.</p>
+          </div>
+          <div class="stat">
+            <div class="stat-num accent num">4 / 4</div>
+            <p class="stat-label">Settlement evidence complete in the last 24 h.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPROVAL QUEUE -->
+    <section class="section" data-od-id="approval-queue">
+      <div class="container">
+        <div style="max-width: 38ch;">
+          <p class="eyebrow">APPROVAL QUEUE</p>
+          <h2>Two missions above the spending limit.</h2>
+          <p class="lead" style="margin-top: 16px;">Anything under the autonomous limit executes without asking. Anything above lands here for human authority.</p>
+        </div>
+
+        <div class="queue" style="margin-top: 32px;">
+          <div class="queue-item">
+            <span class="q-id">M-104</span>
+            <div class="q-body">
+              <h4>Wholesale energy block · Q3 procurement</h4>
+              <p>Aggregating 14 P1 + 3 PCO tenants into one 6-week forward block. Counterparty: Northwind Power. Settlement: net-30.</p>
+            </div>
+            <span class="q-amount">£48,200</span>
+            <span class="q-state approve">Awaiting approval</span>
+          </div>
+
+          <div class="queue-item">
+            <span class="q-id">M-107</span>
+            <div class="q-body">
+              <h4>Reinvestment · biomethane feedstock expansion</h4>
+              <p>Deploy £22,000 from reinvestment pool into biomethane feedstock contract. Asset class 5. ROCE target 14%.</p>
+            </div>
+            <span class="q-amount">£22,000</span>
+            <span class="q-state approve">Awaiting approval</span>
+          </div>
+
+          <div class="queue-item">
+            <span class="q-id">M-098</span>
+            <div class="q-body">
+              <h4>Hedge R-014 — gross-up cover (illustrative)</h4>
+              <p>Hold pending ITEPA s204 advice. Risk register flags a £6,207 illustrative gross exposure vs. £3,600 net.</p>
+            </div>
+            <span class="q-amount">£3,600</span>
+            <span class="q-state hold">Hold for advice</span>
+          </div>
+
+          <div class="queue-item">
+            <span class="q-id">M-102</span>
+            <div class="q-body">
+              <h4>Counterparty X settlement delay · escalate</h4>
+              <p>Supplier X mean delay 6 d vs. contract 3 d. Two prior incidents on file. Escalate to commercial review.</p>
+            </div>
+            <span class="q-amount">—</span>
+            <span class="q-state hedge">Commercial review</span>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 32px;">
+          <button class="btn btn-primary">Approve selected</button>
+          <button class="btn btn-secondary">Hold</button>
+          <button class="btn btn-ghost">Reject with reason</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHOLESALE BLOCK AGGREGATION -->
+    <section class="section" data-od-id="wholesale-block">
+      <div class="container">
+        <div class="grid-2-1">
+          <div>
+            <p class="eyebrow">WHOLESALE BLOCK AGGREGATION</p>
+            <h2>Fragmented retail demand becomes one wholesale block.</h2>
+            <p class="lead" style="margin-top: 16px;">Compatible P1/PCO demand is aggregated before procurement. The wider the block, the wider the spread the twin can capture.</p>
+          </div>
+          <div class="card">
+            <p class="eyebrow-muted">OPEN BLOCK · M-104</p>
+            <h3 class="h3">Q3 forward energy block</h3>
+            <p class="muted" style="margin-top: 8px;">14 P1 households + 3 PCO sites · 6-week delivery window</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Aggregate volume</span><span class="v num">284 MWh</span></div>
+            <div class="kv"><span class="k">Indicative price</span><span class="v num">£169.7 / MWh</span></div>
+            <div class="kv"><span class="k">Counterparty</span><span class="v">Northwind Power</span></div>
+            <div class="kv"><span class="k">Block close</span><span class="v">T + 02 d 14 h</span></div>
+            <div class="kv"><span class="k">Aggregation lift</span><span class="v num accent">+11.6%</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+          <p class="eyebrow-muted">PARTICIPATING TWINS · 17 OF 17 JOINED</p>
+          <div class="timeline" style="margin-top: 18px;">
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick passed"></div>
+            <div class="tick now"></div>
+            <div class="tick"></div>
+            <div class="tick"></div>
+            <div class="tick"></div>
+          </div>
+          <div class="tick-meta">
+            <span>Open · T − 8 d</span>
+            <span>Now · T − 0</span>
+            <span>Close · T + 02 d 14 h</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIVE MISSIONS GRID -->
+    <section class="section" data-od-id="missions">
+      <div class="container">
+        <div style="max-width: 36ch;">
+          <p class="eyebrow">ACTIVE MISSIONS</p>
+          <h2>Seven in flight, all under the autonomous limit.</h2>
+        </div>
+
+        <div class="grid-3" style="margin-top: 32px;">
+          <div class="card">
+            <p class="eyebrow-muted">M-101 · SUPPLY</p>
+            <h3 class="h3">Nutrition wholesale procurement</h3>
+            <p class="muted" style="margin-top: 8px;">Aggregated 8 P1 households into a monthly staples block. Within limit.</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Agent</span><span class="v">supply-procure-04</span></div>
+            <div class="kv"><span class="k">Spend</span><span class="v num">£1,840</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v accent">Auto-executed</span></div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow-muted">M-103 · LOGISTICS</p>
+            <h3 class="h3">Freight consolidation · W26</h3>
+            <p class="muted" style="margin-top: 8px;">3 PCO sites consolidated to a single weekly freight contract.</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Agent</span><span class="v">freight-agg-01</span></div>
+            <div class="kv"><span class="k">Spend</span><span class="v num">£2,460</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v accent">Auto-executed</span></div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow-muted">M-105 · SETTLEMENT</p>
+            <h3 class="h3">Counterparty Y · outcome fee</h3>
+            <p class="muted" style="margin-top: 8px;">Q2 outcome fee settlement recorded. Evidence: counterparty ack + delivery receipt.</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Agent</span><span class="v">settlement-evidence-02</span></div>
+            <div class="kv"><span class="k">Spend</span><span class="v num">£0</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v accent">Evidenced</span></div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow-muted">M-106 · HEDGE</p>
+            <h3 class="h3">Treasury yield sweep</h3>
+            <p class="muted" style="margin-top: 8px;">Idle surplus above the survival floor swept into 30-day treasury bill.</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Agent</span><span class="v">treasury-01</span></div>
+            <div class="kv"><span class="k">Spend</span><span class="v num">£18,000</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v accent">Auto-executed</span></div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow-muted">M-108 · MONITOR</p>
+            <h3 class="h3">Counterparty health · 7 d</h3>
+            <p class="muted" style="margin-top: 8px;">Continuous monitor. No action required. Tracking 11 counterparties.</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Agent</span><span class="v">health-watch-01</span></div>
+            <div class="kv"><span class="k">Spend</span><span class="v num">£0</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v">Running</span></div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow-muted">M-109 · SUPPLY</p>
+            <h3 class="h3">Shelter · plant maintenance cycle</h3>
+            <p class="muted" style="margin-top: 8px;">Routine maintenance scheduled across 2 sites. Within limit.</p>
+            <div class="kv" style="margin-top: 16px;"><span class="k">Agent</span><span class="v">plant-maint-02</span></div>
+            <div class="kv"><span class="k">Spend</span><span class="v num">£960</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v accent">Auto-executed</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTLEMENT EVIDENCE -->
+    <section class="section" data-od-id="evidence">
+      <div class="container">
+        <div style="max-width: 36ch;">
+          <p class="eyebrow">SETTLEMENT EVIDENCE · LAST 24 H</p>
+          <h2>4 of 4 missions evidenced and written back to Pulse.</h2>
+        </div>
+
+        <table class="ds-table" style="margin-top: 32px;">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Mission</th>
+              <th>Counterparty</th>
+              <th>Type</th>
+              <th class="num-col">Amount</th>
+              <th class="num-col">Settled at</th>
+              <th>Evidence</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="num">M-100</td>
+              <td>Northwind Power</td>
+              <td>Wholesale procurement</td>
+              <td class="num-col">£42,180</td>
+              <td class="num-col">T-21 h</td>
+              <td>Counterparty ack · delivery receipt</td>
+              <td>Evidenced</td>
+            </tr>
+            <tr>
+              <td class="num">M-101</td>
+              <td>Staples UK</td>
+              <td>Nutrition block</td>
+              <td class="num-col">£1,840</td>
+              <td class="num-col">T-18 h</td>
+              <td>Counterparty ack</td>
+              <td>Evidenced</td>
+            </tr>
+            <tr>
+              <td class="num">M-103</td>
+              <td>Freight Co.</td>
+              <td>Logistics</td>
+              <td class="num-col">£2,460</td>
+              <td class="num-col">T-09 h</td>
+              <td>GPS + POD</td>
+              <td>Evidenced</td>
+            </tr>
+            <tr>
+              <td class="num">M-106</td>
+              <td>Treasury desk</td>
+              <td>Yield sweep</td>
+              <td class="num-col">£18,000</td>
+              <td class="num-col">T-02 h</td>
+              <td>Trade ticket</td>
+              <td>Evidenced</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- NEXT -->
+    <section class="section" data-od-id="next">
+      <div class="container">
+        <div style="max-width: 36ch;">
+          <p class="eyebrow">CONTINUE</p>
+          <h2>From the two surfaces to the digital replicas.</h2>
+          <p class="lead" style="margin-top: 16px;">Pulse + Dispatch are the operating grammar. The next page is where that grammar gets applied to specific business replicas — Sim-LAES, Sim-Refinery — bounded scenarios you can scrub.</p>
+          <div class="hero-cta" style="margin-top: 28px;">
+            <a class="btn btn-primary" href="digital-replicas.html">Open digital replicas</a>
+            <a class="btn btn-ghost btn-arrow" href="taxonomy.html">Or read the taxonomy</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pagefoot" data-od-id="footer">
+    <div class="container row-between">
+      <span>© visualp · page 04 · Dispatch</span>
+      <span class="meta"><a href="sovereign-pulse.html">← Pulse</a> · <a href="digital-replicas.html">Next → Replicas</a></span>
+    </div>
+  </footer>
+</body>
+</html>
