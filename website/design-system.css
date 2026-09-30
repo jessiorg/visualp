@@ -454,3 +454,165 @@ h1, h2, h3, h4 { text-wrap: balance; }
 .tight { line-height: 1.4; }
 .no-top-border + .no-top-border, .no-top-border:first-of-type { border-top: 0; }
 hr.thick { border: 0; border-top: 1px solid var(--fg); margin: 0; }
+
+/* ─── Department atlas primitives ─────────────────────────────────
+   Eight departments, one shape: visual + 3 KPIs + lever + leakage.
+   All visuals are inline SVG; no JS, no canvas. ──────────────── */
+
+.dept-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-lg);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--gap-xl);
+  align-items: start;
+}
+.dept-card .visual {
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--gap-md);
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dept-card .visual svg { max-width: 100%; height: auto; }
+.dept-card .kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-sm);
+  margin-top: var(--gap-md);
+}
+.dept-card .kpi {
+  border-left: 2px solid var(--border);
+  padding: 4px 10px;
+}
+.dept-card .kpi .label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.dept-card .kpi .value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+.dept-card .kpi .delta { font-family: var(--font-mono); font-size: 12px; }
+.dept-card .leverage {
+  margin-top: var(--gap-md);
+  padding-top: var(--gap-md);
+  border-top: 1px dashed var(--border);
+  display: flex;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.dept-card .leverage .lever-pill {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.dept-card .leakage {
+  margin-top: var(--gap-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--state-hedge-fg);
+}
+.dept-card .leakage .badge {
+  display: inline-block;
+  background: var(--state-hedge-bg);
+  color: var(--state-hedge-fg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-right: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+.dept-card .dept-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* atlas grid: two departments per row on wide screens */
+.atlas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-lg);
+}
+@media (max-width: 920px) {
+  .atlas-grid { grid-template-columns: 1fr; }
+  .dept-card { grid-template-columns: 1fr; }
+  .dept-card .kpi-row { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* dept-card variants for full-width emphasis (e.g. Finance hero) */
+.dept-card.full {
+  grid-template-columns: 1fr;
+}
+.dept-card.full .visual { min-height: 320px; }
+.dept-card.full .kpi-row .kpi .value { font-size: 32px; }
+.dept-card.full .kpi-row .kpi.headline .value { font-size: 56px; }
+
+/* big-num hero — for finance liquidity, ops throughput, etc. */
+.big-num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--ink-deep);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.big-num.xl { font-size: clamp(56px, 8vw, 96px); }
+.big-num.l  { font-size: clamp(40px, 5vw, 64px); }
+.big-num.m  { font-size: clamp(28px, 3vw, 40px); }
+
+.formula {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--fg);
+}
+.formula .op { color: var(--muted); margin: 0 8px; }
+.formula .res { color: var(--ink-deep); font-weight: 500; }
+
+/* mini-bar (used inside dept visuals) */
+.mini-bar { display: flex; gap: 2px; align-items: end; height: 60px; }
+.mini-bar span {
+  flex: 1; background: var(--accent); border-radius: 2px 2px 0 0;
+  min-height: 2px;
+}
+
+/* force-field ring (finance) */
+.ff-ring {
+  position: relative;
+  width: 100%; aspect-ratio: 1.6 / 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.ff-ring svg { width: 100%; height: 100%; }
+.ff-legend {
+  display: flex; gap: var(--gap-md); flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  margin-top: var(--gap-sm);
+}
+.ff-legend span::before {
+  content: ''; display: inline-block; width: 10px; height: 10px;
+  margin-right: 6px; border-radius: 2px; vertical-align: middle;
+}
+.ff-legend .st::before { background: var(--ink-deep); }
+.ff-legend .pd::before { background: var(--accent); }
+.ff-legend .fl::before { background: color-mix(in oklch, var(--accent) 50%, var(--ink-deep)); }
