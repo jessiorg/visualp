@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A Day in the Visual Company — visualp</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+  /* Page-only chrome: matches the time-use simulation pattern
+     (time display + play/pause/reset + slow/fast + four panels)
+     but rebinds it to the PCO / fiscal-cycle context. */
+  .sim-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 920px) {
+    .sim-stage { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .sim-clock-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 12px 0 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .sim-clock {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    color: var(--fg);
+  }
+  .sim-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .sim-btn {
+    width: 38px; height: 38px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--fg);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 160ms ease, border-color 160ms ease;
+  }
+  .sim-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--accent);
+  }
+  .sim-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .sim-toggle-row {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .sim-toggle {
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+  }
+  .sim-toggle.current {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* Simulation panels */
+  #sim-chart {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    min-height: 520px;
+    position: relative;
+  }
+  .sim-centre-label {
+    font-family: var(--font-display);
+    font-size: 22px;
+    fill: var(--fg);
+    letter-spacing: 0.04em;
+  }
+  .sim-centre-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .sim-dept-label { cursor: default; }
+  .sim-dept-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--fg);
+    letter-spacing: 0.02em;
+  }
+  .sim-dept-pct {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--muted);
+  }
+  .sim-dot { cursor: pointer; }
+  .sim-dot:hover {
+    stroke: var(--fg);
+    stroke-width: 1.2;
+  }
+
+  /* Right column */
+  .sim-side { display: flex; flex-direction: column; gap: 18px; }
+  .sim-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .sim-panel h3 {
+    margin: 0 0 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  #sim-ranking { list-style: none; margin: 0; padding: 0; }
+  #sim-ranking li {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  #sim-ranking li:last-child { border-bottom: 0; }
+  .rk-num   { color: var(--muted); }
+  .rk-name  { color: var(--fg); }
+  .rk-pct   { color: var(--accent); }
+
+  #sim-tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 100ms ease;
+    z-index: 50;
+  }
+
+  #sim-treemap { margin-top: 24px; }
+  .tm-header { padding: 16px 0 12px; border-bottom: 1px solid var(--border); }
+  .tm-kind {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--fg);
+    letter-spacing: 0.01em;
+  }
+  .tm-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .tm-risk { padding: 1px 8px; border-radius: 999px; }
+  .tm-risk-lime  { background: var(--accent-soft); color: var(--accent); }
+  .tm-risk-amber { background: var(--state-warn-soft); color: var(--state-warn); }
+  .tm-risk-red   { background: var(--state-bad-soft);  color: var(--state-bad);  }
+  .tm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .tm-cell {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tm-cell-lime  { border-left: 4px solid var(--accent); }
+  .tm-cell-amber { border-left: 4px solid var(--state-warn); }
+  .tm-cell-red   { border-left: 4px solid var(--state-bad); }
+  .tm-cell-name  { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .tm-cell-val   { font-family: var(--font-display); font-size: 20px; color: var(--fg); }
+  .tm-cell-pct   { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+  .tm-note {
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .sim-readout {
+    margin-top: 8px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- Topnav -->
+<header class="topnav" data-od-id="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">visualp<span class="dot">·</span></a>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="company.html">Company</a>
+      <a href="business-activities.html">Business activities</a>
+      <a href="sovereign-pulse.html">Pulse</a>
+      <a href="dispatch.html">Dispatch</a>
+      <a href="digital-replicas.html" aria-current="page">Digital replicas</a>
+      <a href="taxonomy.html">Taxonomy</a>
+    </nav>
+    <span class="pill"><span class="stage-chip replica" style="border:0;background:transparent;padding:0;color:inherit;font-size:11px;"><span class="dot"></span>Live sim</span></span>
+  </div>
+</header>
+
+<main id="content">
+
+  <!-- Hero -->
+  <section class="hero" data-od-id="hero">
+    <p class="eyebrow">Digital replicas · live sim</p>
+    <h1 class="hero-title">A day in the visual company</h1>
+    <p class="lead">
+      The simulation runs <strong>1,000 transactions across the eight departments</strong> over a
+      30-day fiscal cycle. Each dot is one transaction flowing through the company — its value
+      moves through the audit trail, accumulating in each department as it progresses.
+      Click any dot for the single-transaction audit. Numbers are illustrative
+      (planning set; will wire to the classification + datasets repos in the next pass).
+    </p>
+  </section>
+
+  <!-- Stage: chart + side panels -->
+  <section data-od-id="sim-stage">
+    <div class="sim-stage">
+
+      <!-- Chart panel -->
+      <div>
+        <div class="sim-clock-row">
+          <div class="sim-clock" id="sim-clock">Day 1 of 30</div>
+          <div class="sim-controls">
+            <button id="sim-reset" class="sim-btn" aria-label="Reset">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8a5 5 0 1 0 1.5-3.5"/><path d="M3 3v3h3"/></svg>
+            </button>
+            <button id="sim-play" class="sim-btn" aria-label="Play">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 3l9 5-9 5z"/></svg>
+            </button>
+            <button id="sim-pause" class="sim-btn" style="display:none" aria-label="Pause">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="3" width="3" height="10"/><rect x="9" y="3" width="3" height="10"/></svg>
+            </button>
+            <div class="sim-toggle-row" role="tablist">
+              <button class="sim-toggle current" data-val="slow" role="tab">Slow</button>
+              <button class="sim-toggle" data-val="fast" role="tab">Fast</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="sim-chart" aria-label="Fiscal-cycle simulation of 1,000 transactions across eight departments"></div>
+        <div id="sim-tooltip" role="tooltip"></div>
+
+        <p class="sim-readout">
+          <strong style="color:var(--fg)">Read this:</strong>
+          Eight rim zones = the eight departments. Each dot = one transaction with a deterministic
+          audit trail (which departments it touches, in order, and for how long). Dot colour =
+          risk class (lime cleared, amber pending, red escalation). At each tick the bars and
+          ranking re-sort by current concentration.
+        </p>
+      </div>
+
+      <!-- Side panels -->
+      <aside class="sim-side">
+
+        <div class="sim-panel">
+          <h3>Concentration</h3>
+          <div id="sim-bars" aria-label="Concentration of value by department"></div>
+        </div>
+
+        <div class="sim-panel">
+          <h3>Ranking of departments</h3>
+          <ol id="sim-ranking"></ol>
+        </div>
+
+      </aside>
+
+    </div>
+  </section>
+
+  <!-- Treemap (single-transaction audit) -->
+  <section data-od-id="sim-treemap-section">
+    <div class="section-head">
+      <p class="eyebrow">Click any dot → single-transaction audit</p>
+      <h2>What one transaction's audit trail looks like</h2>
+      <p class="lead">
+        Each dot is one transaction. Click it to see how its value was split across the
+        departments it touched. The risk class drives the cell's accent stripe.
+      </p>
+    </div>
+    <div id="sim-treemap">
+      <p style="font-family:var(--font-mono);font-size:12px;color:var(--muted);padding:24px 0">
+        Click a dot in the simulation to load its audit trail here.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer / next -->
+  <footer class="pagefoot" data-od-id="pagefoot">
+    <a class="prev" href="digital-replicas.html">← Back to Digital replicas</a>
+    <span></span>
+    <a class="next" href="taxonomy.html">Taxonomy →</a>
+  </footer>
+
+</main>
+
+<!-- Globals available to the inline modules above -->
+<script src="assets/d3/d3.v7.min.js"></script>
+<script src="assets/digital-replica-day.js"></script>
+
+</body>
+</html>

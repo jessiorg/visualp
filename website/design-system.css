@@ -21,12 +21,21 @@
   --ink-deep:     oklch(18% 0.018 165);
 
   /* state — for severity pills, risk deltas, etc. */
-  --state-hedge-bg:   oklch(94% 0.04 25);   /* soft red wash */
-  --state-hedge-fg:   oklch(38% 0.12 25);   /* deep red text */
-  --state-warn-bg:    oklch(94% 0.04 75);   /* soft amber wash */
-  --state-warn-fg:    oklch(40% 0.10 60);   /* deep amber text */
-  --state-ok-bg:      var(--accent-soft);
-  --state-ok-fg:      var(--ink-deep);
+  --state-bad:        oklch(38% 0.12 25);   /* deep red text */
+  --state-bad-soft:   oklch(94% 0.04 25);   /* soft red wash */
+  --state-warn:       oklch(40% 0.10 60);   /* deep amber text */
+  --state-warn-soft:  oklch(94% 0.04 75);   /* soft amber wash */
+  --state-ok:         var(--ink-deep);
+  --state-ok-soft:    var(--accent-soft);
+  /* legacy aliases kept for older pages */
+  --state-hedge-bg:   var(--state-bad-soft);
+  --state-hedge-fg:   var(--state-bad);
+  --state-warn-bg:    var(--state-warn-soft);
+  --state-warn-fg:    var(--state-warn);
+  --state-ok-bg:      var(--state-ok-soft);
+  --state-ok-fg:      var(--state-ok);
+  /* surface variant — for hover on neutral panels */
+  --surface-2:        oklch(96% 0.006 150);
 
   /* type */
   --font-display: 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif;
