@@ -23,8 +23,14 @@
   /* state — for severity pills, risk deltas, etc. */
   --state-bad:        oklch(38% 0.12 25);   /* deep red text */
   --state-bad-soft:   oklch(94% 0.04 25);   /* soft red wash */
+  --state-bad-fill:   oklch(55% 0.20 25);   /* dot/bar fill — readable on bg */
   --state-warn:       oklch(40% 0.10 60);   /* deep amber text */
   --state-warn-soft:  oklch(94% 0.04 75);   /* soft amber wash */
+  --state-warn-fill:  oklch(65% 0.16 70);   /* dot/bar fill — readable on bg */
+
+  /* data viz — deeper variants of accent for charts/dots that sit on --bg */
+  --accent-deep:      oklch(72% 0.20 130);  /* dots, bars, lines on bg */
+  --accent-deep-soft: oklch(85% 0.13 130);  /* hover/wash variant */
   --state-ok:         var(--ink-deep);
   --state-ok-soft:    var(--accent-soft);
   /* legacy aliases kept for older pages */

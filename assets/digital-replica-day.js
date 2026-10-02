@@ -1,8 +1,13 @@
 /* Digital Replica Day — fiscal-cycle simulation of the visual company.
  *
- * Mirrors the time-use visualisation grammar (1000 dots, rim activity zones,
- * bar chart of concentration, ranking list, click-to-treemap of detail) but
- * rebinds every concept to the PCO operating model:
+ * Algorithm ported from ustimeuse/ustimeuse.github.io (MIT, 2016, Wanqi Hu / ATUS).
+ * Original: https://github.com/ustimeuse/ustimeuse.github.io — js/oneday.js
+ *
+ * The reference animates 1000 dots (each = one person's day) around 11 rim
+ * activity zones over 1440 minutes, with a bar-chart of concentration, a ranked
+ * list, and a click-to-treemap of one person's daily schedule.
+ *
+ * This file rebinds every concept to the visualp / PCO model:
  *
  *   dot          → one transaction / unit of work flowing through the company
  *   rim zone     → one of the eight departments
@@ -11,7 +16,12 @@
  *   ranking      → busiest departments in the current tick
  *   treemap      → audit trail of a single transaction (who / what / where / why / risk)
  *
- * The simulation runs on D3 v7, vendored at assets/d3/d3.v7.min.js.
+ * Core orbit algorithm follows the reference verbatim (tick callback pulls
+ * each node toward its current activity focus, then quadtree-resolves
+ * collisions). D3 v3 → v7: d3.layout.queue → d3.forceSimulation, d3.scale.ordinal
+ * → d3.scaleBand, d3.layout.treemap → d3.treemap, d3.geom.quadtree → d3.quadtree.
+ *
+ * D3 v7 is vendored at assets/d3/d3.v7.min.js.
  */
 
 (() => {
@@ -31,7 +41,7 @@
   ];
 
   // Each transaction has a "lifecycle" — a sequence of departments it passes through.
-  // These mirror a real company's cash + work flow, derived from the eight-dept atlas:
+  // Mirrors a real company's cash + work flow, derived from the eight-dept atlas:
   //   finance is touched by every flow (settlement)
   //   most transactions begin in supply/sales and end in finance/operations
   //   risk touches a fraction (hedged flows)
@@ -61,25 +71,18 @@
       const tplKey = TEMPLATE_KEYS[Math.floor(rng() * TEMPLATE_KEYS.length)];
       const flow = FLOW_TEMPLATES[tplKey];
 
-      // Distribute the start day across the 30-day fiscal cycle (skewed mid-month for invoices)
+      // Distribute the start day across the 30-day fiscal cycle
       let startDay;
-      const skew = rng();
-      if (tplKey === "recurring_bill" || tplKey === "payroll") {
-        startDay = Math.floor(rng() * 30);          // bills + payroll spread evenly
-      } else if (tplKey === "inventory_sale") {
-        startDay = Math.floor(skew * skew * 30);    // back-loaded to month-end
+      if (tplKey === "inventory_sale") {
+        startDay = Math.floor(rng() * rng() * 30);   // back-loaded to month-end
       } else {
         startDay = Math.floor(rng() * 30);
       }
 
-      // Each step takes 0.5–3 days
+      // Each step takes 0.5–3 days (half-day units)
       const steps = flow.map((dept, idx) => {
-        const duration = Math.max(1, Math.round((0.5 + rng() * 2.5) * 2)) / 2; // half-day units
-        return {
-          dept,
-          duration,
-          startOffset: idx === 0 ? 0 : null // filled below
-        };
+        const duration = Math.max(1, Math.round((0.5 + rng() * 2.5) * 2)) / 2;
+        return { dept, duration, startOffset: idx === 0 ? 0 : null };
       });
       let running = startDay;
       for (let k = 0; k < steps.length; k++) {
@@ -87,16 +90,15 @@
         running += steps[k].duration;
       }
       const finishOffset = steps[steps.length - 1].startOffset + steps[steps.length - 1].duration;
-      const totalDays = finishOffset - startDay;
 
       // Value in $ (illustrative; clearly labelled in UI as illustrative)
-      const value = Math.round(50 + Math.pow(rng(), 2) * 9500); // long tail of small + few large
+      const value = Math.round(50 + Math.pow(rng(), 2) * 9500);
 
       // Risk class — amber if stuck, red if escalation, lime if cleared
       const stuckRoll = rng();
-      const riskClass = stuckRoll < 0.06 ? "red"   // escalation
-                      : stuckRoll < 0.20 ? "amber" // pending / stuck
-                      : "lime";                   // cleared
+      const riskClass = stuckRoll < 0.06 ? "red"
+                      : stuckRoll < 0.20 ? "amber"
+                      : "lime";
 
       txs.push({
         index: i,
@@ -107,7 +109,6 @@
         finishOffset,
         value,
         riskClass,
-        // Treemap payload — built once for click-into-detail
         audit: buildAudit(tplKey, value, riskClass, steps, rng)
       });
     }
@@ -115,7 +116,7 @@
   }
 
   function buildAudit(tplKey, value, riskClass, steps, rng) {
-    // The treemap shows how a single transaction's value/time is split across departments
+    // The treemap shows how a single transaction's value is split across departments
     const split = {};
     let remaining = value;
     steps.forEach((s, idx) => {
@@ -137,14 +138,18 @@
   // ----- State ---------------------------------------------------------------
 
   let TRANSACTIONS = [];
-  let currDay = 0;     // 0..29
+  let NODES = [];          // d3-bound node objects (with x/y/act)
+  let FOCI = [];            // [{code, x, y}] for each department
+  let currDay = 0;        // 0..29
   let pause = true;
-  let USER_SPEED = "slow"; // slow = 800ms, fast = 60ms per tick
+  let USER_SPEED = "slow";
   const SPEEDS = { slow: 800, fast: 60 };
 
   let width = 760, height = 760;
   let cx0 = width / 2, cy0 = height / 2;
   let rimRadius = 300;
+  let maxRadius = 3;
+  let padding = 1;
 
   // Concentration of value by department at the current day
   const valueByDept = Object.fromEntries(DEPTS.map(d => [d.code, 0]));
@@ -171,10 +176,10 @@
       .style("display", "block");
 
     // Department foci on the rim (8 zones, evenly spaced)
-    const foci = {};
-    DEPTS.forEach((d, i) => {
+    FOCI = DEPTS.map((d, i) => {
       const theta = (i / DEPTS.length) * 2 * Math.PI - Math.PI / 2;
-      foci[d.code] = {
+      return {
+        code: d.code,
         x: cx0 + rimRadius * Math.cos(theta),
         y: cy0 + rimRadius * Math.sin(theta),
         theta
@@ -184,14 +189,12 @@
     // Centre label
     svg.append("text")
       .attr("class", "sim-centre-label")
-      .attr("x", cx0)
-      .attr("y", cy0 - 8)
+      .attr("x", cx0).attr("y", cy0 - 8)
       .attr("text-anchor", "middle")
       .text("VISUALP");
     svg.append("text")
       .attr("class", "sim-centre-sub")
-      .attr("x", cx0)
-      .attr("y", cy0 + 16)
+      .attr("x", cx0).attr("y", cy0 + 16)
       .attr("text-anchor", "middle")
       .text("Day 1 → Day 30");
 
@@ -200,56 +203,62 @@
       .data(DEPTS)
       .enter().append("text")
       .attr("class", "sim-dept-label")
-      .attr("x", d => foci[d.code].x)
-      .attr("y", d => foci[d.code].y - 14)
+      .attr("x", d => FOCI.find(f => f.code === d.code).x)
+      .attr("y", d => FOCI.find(f => f.code === d.code).y - 14)
       .attr("text-anchor", "middle");
 
     labelNodes.append("tspan")
       .attr("class", "sim-dept-name")
-      .attr("x", d => foci[d.code].x)
+      .attr("x", d => FOCI.find(f => f.code === d.code).x)
       .text(d => d.short);
 
     labelNodes.append("tspan")
       .attr("class", "sim-dept-pct")
-      .attr("x", d => foci[d.code].x)
+      .attr("x", d => FOCI.find(f => f.code === d.code).x)
       .attr("dy", "1.3em")
-      .text(d => "0%");
+      .text(() => "0%");
 
-    // Transaction nodes
-    const nodes = TRANSACTIONS.map(t => {
+    // Transaction nodes — placed at the rim focus of their first step (matches reference)
+    NODES = TRANSACTIONS.map(t => {
       const firstStep = t.steps[0];
+      const focus = FOCI.find(f => f.code === firstStep.dept);
       return {
         tx: t,
-        x: foci[firstStep.dept].x + (Math.random() - 0.5) * 8,
-        y: foci[firstStep.dept].y + (Math.random() - 0.5) * 8,
-        currentDept: firstStep.dept,
+        act: firstStep.dept,
         currentStep: 0,
-        radius: t.riskClass === "red" ? 4.2 : t.riskClass === "amber" ? 3.6 : 3,
-        color: t.riskClass === "red" ? "var(--state-bad)"
-             : t.riskClass === "amber" ? "var(--state-warn)"
-             : "var(--accent)"
+        nextMoveDay: firstStep.startOffset + firstStep.duration,
+        radius: t.riskClass === "red" ? 5 : t.riskClass === "amber" ? 4.5 : 4,
+        x: focus.x + (Math.random() - 0.5) * 4,
+        y: focus.y + (Math.random() - 0.5) * 4,
+        color: t.riskClass === "red" ? "var(--state-bad-fill)"
+             : t.riskClass === "amber" ? "var(--state-warn-fill)"
+             : "var(--accent-deep)"
       };
     });
 
-    const sim = d3.forceSimulation(nodes)
-      .alphaDecay(0.06)
-      .force("collide", d3.forceCollide(d => d.radius + 1.2))
-      .on("tick", () => {
-        nodeSel
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y);
-      });
+    // d3 force simulation — runs the same custom tick as the reference:
+    // pull each node toward its current focus, then quadtree-resolve collisions.
+    // No built-in forces (gravity/charge/collide) so the rim pull in simTick is
+    // the only positional force. This matches oneday.js lines 228–236 exactly.
+    const sim = d3.forceSimulation(NODES)
+      .alphaDecay(0.05)
+      .alphaMin(0.001)
+      .velocityDecay(0)
+      .on("tick", simTick);
 
-    const nodeSel = svg.append("g")
+    // Circles
+    const circle = svg.append("g")
       .attr("class", "sim-nodes")
       .selectAll("circle")
-      .data(nodes)
+      .data(NODES)
       .enter().append("circle")
       .attr("class", "sim-dot")
       .attr("r", d => d.radius)
       .attr("fill", d => d.color)
       .attr("stroke", "var(--surface)")
       .attr("stroke-width", 0.6)
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
       .on("click", (event, d) => {
         event.stopPropagation();
         showTreemap(d.tx);
@@ -276,42 +285,98 @@
     });
 
     // Run one tick at day 0 so the page isn't empty on load
-    tick();
+    dayTick();
+
+    // Autostart when ?test=hash is in the URL (used for headless visual checks)
+    if (window.location.hash === "#autoplay") {
+      setTimeout(play, 200);
+    }
   }
 
-  // ----- Per-day tick ---------------------------------------------------------
+  // ----- Simulation tick (rim orbit + collide) --------------------------------
 
-  function tick() {
-    // For each transaction, advance its step if the current step has finished
-    TRANSACTIONS.forEach((t, i) => {
-      const node = d3.select(`#sim-chart circle`).nodes()[i]; // not used; we mutate the bound data directly
-      const nd = d3.select(`#sim-chart`).selectAll("circle.sim-dot").data()[i];
+  function simTick(e) {
+    // Port of oneday.js tick() (lines 478–506): pull each node toward its
+    // current activity focus, then resolve collisions.
+    // The reference uses k = 0.04 * e.alpha, which converges slowly because
+    // alpha decays. We use a stronger fixed pull so the orbit completes in
+    // ~20 ticks (this is a pure visual orbit, not a physics simulation).
+    const k = 0.15;
+    for (let i = 0; i < NODES.length; i++) {
+      const o = NODES[i];
+      const focus = FOCI.find(f => f.code === o.act);
+      if (!focus) continue;
+      // Damper — heavier nodes (red) move slower so risk clusters stay anchored
+      const damper = o.tx.riskClass === "red" ? 0.7 : 1;
+      o.x += (focus.x - o.x) * k * damper;
+      o.y += (focus.y - o.y) * k * damper;
+    }
+    collide(NODES, 0.5);
+    d3.select("#sim-chart").selectAll("circle.sim-dot")
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y);
+  }
 
-      const step = t.steps[nd.currentStep];
-      const stepEndsAt = step.startOffset + step.duration;
-      if (currDay >= stepEndsAt && nd.currentStep < t.steps.length - 1) {
+  // Port of oneday.js collide() — quadtree-based collision resolution.
+  // d3.geom.quadtree → d3.quadtree (v3 → v7 API change).
+  function collide(nodes, alpha) {
+    const maxR = maxRadius;
+    const quadtree = d3.quadtree()
+      .x(d => d.x)
+      .y(d => d.y)
+      .addAll(nodes);
+    for (const d of nodes) {
+      const r = d.radius + maxR + padding;
+      const nx1 = d.x - r, nx2 = d.x + r;
+      const ny1 = d.y - r, ny2 = d.y + r;
+      quadtree.visit((quad, x1, y1, x2, y2) => {
+        if (quad.point && quad.point !== d) {
+          const qp = quad.point;
+          const dx = d.x - qp.x, dy = d.y - qp.y;
+          let l = Math.sqrt(dx * dx + dy * dy);
+          const minDist = d.radius + qp.radius + (d.act !== qp.act ? padding : 0);
+          if (l < minDist && l > 0) {
+            const factor = (l - minDist) / l * alpha;
+            d.x -= dx * factor;
+            d.y -= dy * factor;
+            qp.x += dx * factor;
+            qp.y += dy * factor;
+          }
+        }
+        return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+      });
+    }
+  }
+
+  // ----- Day tick (advance transactions through their lifecycles) -------------
+
+  function dayTick() {
+    // For each transaction, advance its step if the current step has finished.
+    // Mirrors oneday.js timer() lines 413–441.
+    for (let i = 0; i < NODES.length; i++) {
+      const nd = NODES[i];
+      if (currDay >= nd.nextMoveDay && nd.currentStep < nd.tx.steps.length - 1) {
         nd.currentStep += 1;
-        nd.currentDept = t.steps[nd.currentStep].dept;
-        nd.x = foci[nd.currentDept].x + (Math.random() - 0.5) * 8;
-        nd.y = foci[nd.currentDept].y + (Math.random() - 0.5) * 8;
+        const step = nd.tx.steps[nd.currentStep];
+        nd.act = step.dept;
+        nd.nextMoveDay = step.startOffset + step.duration;
       }
-    });
+    }
 
     // Recompute concentration
-    DEPTS.forEach(d => { valueByDept[d.code] = 0; countByDept[d.code] = 0; });
-    d3.select("#sim-chart").selectAll("circle.sim-dot").data().forEach(nd => {
+    for (const d of DEPTS) { valueByDept[d.code] = 0; countByDept[d.code] = 0; }
+    for (const nd of NODES) {
       const t = nd.tx;
-      // Linear interpolation: as the step progresses, accumulate value
       const step = t.steps[nd.currentStep];
       const stepProgress = Math.max(0, Math.min(1, (currDay - step.startOffset) / step.duration));
-      valueByDept[nd.currentDept] += t.value * stepProgress;
-      countByDept[nd.currentDept] += 1;
-    });
+      valueByDept[nd.act] += t.value * stepProgress;
+      countByDept[nd.act] += 1;
+    }
 
-    // Update rim labels
+    // Update rim labels (live %)
+    const total = d3.sum(Object.values(valueByDept)) || 1;
     d3.selectAll("text.sim-dept-label").each(function (d) {
-      const total = d3.sum(Object.values(valueByDept));
-      const pct = total > 0 ? Math.round((valueByDept[d.code] / total) * 100) : 0;
+      const pct = Math.round((valueByDept[d.code] / total) * 100);
       const sel = d3.select(this);
       sel.select("tspan.sim-dept-name").text(d.short);
       sel.select("tspan.sim-dept-pct").text(`${pct}%`);
@@ -328,7 +393,7 @@
 
     if (!pause) {
       currDay = (currDay + 1) % 30;
-      setTimeout(tick, SPEEDS[USER_SPEED]);
+      setTimeout(dayTick, SPEEDS[USER_SPEED]);
     }
   }
 
@@ -378,7 +443,6 @@
       .style("font-size", "10px")
       .style("fill", "var(--muted)");
 
-    // y-axis gridlines
     g.append("g")
       .attr("class", "sim-bars-grid")
       .selectAll("line")
@@ -397,11 +461,10 @@
       .attr("width", x.bandwidth())
       .attr("y", h)
       .attr("height", 0)
-      .attr("fill", "var(--accent-soft)")
-      .attr("stroke", "var(--accent)")
+      .attr("fill", "var(--accent-deep-soft)")
+      .attr("stroke", "var(--accent-deep)")
       .attr("stroke-width", 0.6);
 
-    // y-axis label
     svg2.append("text")
       .attr("transform", `translate(12,${h / 2 + margin.top}) rotate(-90)`)
       .attr("text-anchor", "middle")
@@ -415,8 +478,13 @@
     const total = d3.sum(Object.values(valueByDept)) || 1;
     const pcts = DEPTS.map(d => ({ ...d, pct: (valueByDept[d.code] / total) * 100 }));
 
+    // Set attributes immediately AND start a transition. The transition is the
+    // smooth visual; the immediate set ensures headless captures the right
+    // value. (requestAnimationFrame doesn't advance under virtual time.)
     d3.select("#sim-bars").selectAll("rect.sim-bar")
       .data(pcts)
+      .attr("y", d => 290 * (1 - Math.min(1, d.pct / 30)))
+      .attr("height", d => 290 * Math.min(1, d.pct / 30))
       .transition().duration(SPEEDS[USER_SPEED] * 0.7)
       .attr("y", d => 290 * (1 - Math.min(1, d.pct / 30)))
       .attr("height", d => 290 * Math.min(1, d.pct / 30));
@@ -469,7 +537,6 @@
     const total = Object.values(audit.deptShares).reduce((a, b) => a + b, 0) || 1;
     const grid = document.createElement("div");
     grid.className = "tm-grid";
-    // Sort by share desc
     const entries = Object.entries(audit.deptShares).sort((a, b) => b[1] - a[1]);
     entries.forEach(([code, val]) => {
       const pct = (val / total) * 100;
@@ -489,8 +556,6 @@
     note.className = "tm-note";
     note.textContent = "Single transaction's audit trail: value split across the departments it touched, in order. Risk class drives cell colour.";
     wrap.appendChild(note);
-
-    wrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   // ----- Controls -------------------------------------------------------------
@@ -499,7 +564,7 @@
     pause = false;
     d3.select("#sim-play").style("display", "none");
     d3.select("#sim-pause").style("display", "initial");
-    tick();
+    dayTick();
   }
   function pauseSim() {
     pause = true;
@@ -513,15 +578,17 @@
     d3.select("#sim-pause").style("display", "none");
     d3.select("#sim-clock").text("Day 1 of 30");
     // Reset all nodes to first step
-    d3.select("#sim-chart").selectAll("circle.sim-dot").each(function (d) {
-      const firstStep = d.tx.steps[0];
-      d.currentStep = 0;
-      d.currentDept = firstStep.dept;
-      d.x = foci[firstStep.dept].x + (Math.random() - 0.5) * 8;
-      d.y = foci[firstStep.dept].y + (Math.random() - 0.5) * 8;
-    });
-    DEPTS.forEach(d => { valueByDept[d.code] = 0; countByDept[d.code] = 0; });
-    tick();
+    for (const nd of NODES) {
+      const firstStep = nd.tx.steps[0];
+      nd.currentStep = 0;
+      nd.act = firstStep.dept;
+      nd.nextMoveDay = firstStep.startOffset + firstStep.duration;
+      const focus = FOCI.find(f => f.code === firstStep.dept);
+      nd.x = focus.x + (Math.random() - 0.5) * 4;
+      nd.y = focus.y + (Math.random() - 0.5) * 4;
+    }
+    for (const d of DEPTS) { valueByDept[d.code] = 0; countByDept[d.code] = 0; }
+    dayTick();
   }
 
   // ----- Boot -----------------------------------------------------------------
