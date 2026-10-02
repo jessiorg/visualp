@@ -296,11 +296,13 @@
     // Run one tick at day 0 so the page isn't empty on load
     dayTick();
 
-    // Autostart when #autoplay is in the URL hash, or ?autoplay=1 in the query
-    // (used for headless visual checks and quick page-load demos).
+    // Autostart unless the URL has ?paused=1 (lets embedding sites or screenshots
+    // load the static initial frame). Default behaviour: animate from the moment
+    // the user lands on the page, so they see the full 30-day cycle without
+    // having to find and click Play.
     const usp = new URLSearchParams(window.location.search);
-    if (window.location.hash === "#autoplay" || usp.get("autoplay") === "1") {
-      setTimeout(play, 200);
+    if (window.location.hash === "#autoplay" || usp.get("paused") !== "1") {
+      setTimeout(play, 600);
     }
   }
 
