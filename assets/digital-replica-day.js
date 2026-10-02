@@ -140,6 +140,7 @@
   let TRANSACTIONS = [];
   let NODES = [];          // d3-bound node objects (with x/y/act)
   let FOCI = [];            // [{code, x, y}] for each department
+  let sim = null;          // d3.forceSimulation instance (hoisted from inside build())
   let currDay = 0;        // 0..29
   let pause = true;
   let USER_SPEED = "slow";
@@ -218,18 +219,26 @@
       .attr("dy", "1.3em")
       .text(() => "0%");
 
-    // Transaction nodes — placed at the rim focus of their first step (matches reference)
+    // Transaction nodes — placed at the rim focus of their first step (matches reference).
+    // Each node gets a stable random offset (offsetX/offsetY) so dots form a small cloud
+    // around each dept focus instead of all collapsing to the same pixel.
     NODES = TRANSACTIONS.map(t => {
       const firstStep = t.steps[0];
       const focus = FOCI.find(f => f.code === firstStep.dept);
+      // Distribute offset on a ring of radius 8–18 px around the focus,
+      // so the cloud spreads but stays clearly inside the dept zone.
+      const ringR = 8 + Math.random() * 10;
+      const ringA = Math.random() * Math.PI * 2;
       return {
         tx: t,
         act: firstStep.dept,
         currentStep: 0,
         nextMoveDay: firstStep.startOffset + firstStep.duration,
         radius: t.riskClass === "red" ? 5 : t.riskClass === "amber" ? 4.5 : 4,
-        x: focus.x + (Math.random() - 0.5) * 4,
-        y: focus.y + (Math.random() - 0.5) * 4,
+        offsetX: ringR * Math.cos(ringA),
+        offsetY: ringR * Math.sin(ringA),
+        x: focus.x + ringR * Math.cos(ringA),
+        y: focus.y + ringR * Math.sin(ringA),
         color: t.riskClass === "red" ? "var(--state-bad-fill)"
              : t.riskClass === "amber" ? "var(--state-warn-fill)"
              : "var(--accent-deep)"
@@ -240,7 +249,7 @@
     // pull each node toward its current focus, then quadtree-resolve collisions.
     // No built-in forces (gravity/charge/collide) so the rim pull in simTick is
     // the only positional force. This matches oneday.js lines 228–236 exactly.
-    const sim = d3.forceSimulation(NODES)
+    sim = d3.forceSimulation(NODES)
       .alphaDecay(0.05)
       .alphaMin(0.001)
       .velocityDecay(0)
@@ -297,19 +306,21 @@
 
   function simTick(e) {
     // Port of oneday.js tick() (lines 478–506): pull each node toward its
-    // current activity focus, then resolve collisions.
-    // The reference uses k = 0.04 * e.alpha, which converges slowly because
-    // alpha decays. We use a stronger fixed pull so the orbit completes in
-    // ~20 ticks (this is a pure visual orbit, not a physics simulation).
-    const k = 0.15;
+    // current activity focus + per-node offset, then resolve collisions.
+    // The reference uses k = 0.04 * e.alpha, which gives fast early motion
+    // then slow settle — leaves room for collide() to spread nodes around
+    // the focus. We adopt the same pattern.
+    const k = 0.04 * (e && e.alpha != null ? e.alpha : 1);
     for (let i = 0; i < NODES.length; i++) {
       const o = NODES[i];
       const focus = FOCI.find(f => f.code === o.act);
       if (!focus) continue;
+      const targetX = focus.x + o.offsetX;
+      const targetY = focus.y + o.offsetY;
       // Damper — heavier nodes (red) move slower so risk clusters stay anchored
       const damper = o.tx.riskClass === "red" ? 0.7 : 1;
-      o.x += (focus.x - o.x) * k * damper;
-      o.y += (focus.y - o.y) * k * damper;
+      o.x += (targetX - o.x) * k * damper;
+      o.y += (targetY - o.y) * k * damper;
     }
     collide(NODES, 0.5);
     d3.select("#sim-chart").selectAll("circle.sim-dot")
@@ -353,6 +364,7 @@
   function dayTick() {
     // For each transaction, advance its step if the current step has finished.
     // Mirrors oneday.js timer() lines 413–441.
+    let stepped = false;
     for (let i = 0; i < NODES.length; i++) {
       const nd = NODES[i];
       if (currDay >= nd.nextMoveDay && nd.currentStep < nd.tx.steps.length - 1) {
@@ -360,7 +372,20 @@
         const step = nd.tx.steps[nd.currentStep];
         nd.act = step.dept;
         nd.nextMoveDay = step.startOffset + step.duration;
+        // Snap node to the new dept's rim cloud — matches oneday.js lines 436–437.
+        const focus = FOCI.find(f => f.code === nd.act);
+        if (focus) {
+          nd.x = focus.x + nd.offsetX;
+          nd.y = focus.y + nd.offsetY;
+        }
+        stepped = true;
       }
+    }
+
+    // Reheat the simulation so nodes that changed dept actually orbit toward their new focus
+    // (matches oneday.js timer() line 443 force.resume()).
+    if (stepped && sim) {
+      sim.alpha(0.3).restart();
     }
 
     // Recompute concentration
