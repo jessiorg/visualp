@@ -249,13 +249,6 @@
     // pull each node toward its current focus, then quadtree-resolve collisions.
     // No built-in forces (gravity/charge/collide) so the rim pull in simTick is
     // the only positional force. This matches oneday.js lines 228–236 exactly.
-    // DEBUG: dump first 3 nodes so we can confirm offsetX/offsetY are populated.
-    if (typeof window !== "undefined") {
-      window.__visualp_debug = {
-        firstNodes: NODES.slice(0, 3).map(n => ({act: n.act, x: +n.x.toFixed(2), y: +n.y.toFixed(2), offX: +n.offsetX.toFixed(2), offY: +n.offsetY.toFixed(2)})),
-        FOCI: FOCI.map(f => ({code: f.code, x: +f.x.toFixed(1), y: +f.y.toFixed(1)}))
-      };
-    }
     sim = d3.forceSimulation(NODES)
       .alphaDecay(0.05)
       .alphaMin(0.001)
@@ -303,8 +296,10 @@
     // Run one tick at day 0 so the page isn't empty on load
     dayTick();
 
-    // Autostart when ?test=hash is in the URL (used for headless visual checks)
-    if (window.location.hash === "#autoplay") {
+    // Autostart when #autoplay is in the URL hash, or ?autoplay=1 in the query
+    // (used for headless visual checks and quick page-load demos).
+    const usp = new URLSearchParams(window.location.search);
+    if (window.location.hash === "#autoplay" || usp.get("autoplay") === "1") {
       setTimeout(play, 200);
     }
   }
