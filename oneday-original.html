@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reference · Time Use Simulation — visualp</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    /* Page-only chrome: our topnav, our typography around an unedited reference iframe. */
+    .ref-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 32px;
+    }
+    .ref-frame iframe {
+      width: 100%;
+      height: 1180px;
+      border: 0;
+      display: block;
+    }
+    .ref-attr {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .ref-attr a { color: var(--accent); text-decoration: none; }
+    .ref-attr a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header class="topnav" data-od-id="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">visualp<span class="dot">·</span></a>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="company.html">Company</a>
+      <a href="business-activities.html">Business activities</a>
+      <a href="sovereign-pulse.html">Pulse</a>
+      <a href="dispatch.html">Dispatch</a>
+      <a href="digital-replicas.html">Replicas</a>
+      <a href="taxonomy.html">Taxonomy</a>
+    </nav>
+    <span class="pill"><span class="stage-chip replica" style="border:0;background:transparent;padding:0;color:inherit;font-size:11px;"><span class="dot"></span>Reference</span></span>
+  </div>
+</header>
+
+<main id="content">
+
+  <section class="hero" data-od-id="hero">
+    <p class="eyebrow">Digital replicas · reference</p>
+    <h1 class="hero-title">The original, unchanged.</h1>
+    <p class="lead">
+      The visualp fiscal-cycle sim is a port of this — same grammar (1,000 dots in a
+      circle of activity zones, play/pause/reset, slow/fast, bar chart, ranking,
+      click-to-treemap), rebadged from "a day of human time use" to "a 30-day fiscal
+      cycle of a virtual company". This page runs the <strong>unedited 2016 reference</strong>
+      so you can compare the two side by side.
+    </p>
+  </section>
+
+  <section data-od-id="ref-frame-section">
+    <div class="container">
+      <div class="ref-frame">
+        <iframe src="assets/reference-original/onedayvis.html" title="Time Use Simulation (original, unedited)"></iframe>
+        <p class="ref-attr">
+          Original source: <a href="https://github.com/ustimeuse/ustimeuse.github.io">ustimeuse/ustimeuse.github.io</a>
+          · <a href="https://ustimeuse.github.io/oneday.html">ustimeuse.github.io/oneday.html</a>
+          · <a href="https://github.com/ustimeuse/ustimeuse.github.io/blob/master/LICENSE">MIT licensed</a>.
+          All 1,000 schedules are the real reference data (days-simulated-v2.tsv).
+          No visualp styling is applied to the iframe contents.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="pagefoot" data-od-id="pagefoot">
+    <a class="prev" href="digital-replica-day.html">← Back to the visualp port</a>
+    <span></span>
+    <a class="next" href="index.html">Index →</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

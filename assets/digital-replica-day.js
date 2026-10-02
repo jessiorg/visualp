@@ -140,7 +140,9 @@
   let TRANSACTIONS = [];
   let NODES = [];          // d3-bound node objects (with x/y/act)
   let FOCI = [];            // [{code, x, y}] for each department
-  let sim = null;          // d3.forceSimulation instance (hoisted from inside build())
+  let sim = null;          // render timer wrapper (hoisted from inside build())
+  let renderTimer = null;  // setInterval handle for the 30fps orbit tick
+  let dayTimer = null;     // setTimeout handle for dayTick re-arms
   let currDay = 0;        // 0..29
   let pause = true;
   let USER_SPEED = "slow";
@@ -245,15 +247,15 @@
       };
     });
 
-    // d3 force simulation — runs the same custom tick as the reference:
-    // pull each node toward its current focus, then quadtree-resolve collisions.
-    // No built-in forces (gravity/charge/collide) so the rim pull in simTick is
-    // the only positional force. This matches oneday.js lines 228–236 exactly.
-    sim = d3.forceSimulation(NODES)
-      .alphaDecay(0.05)
-      .alphaMin(0.001)
-      .velocityDecay(0)
-      .on("tick", simTick);
+    // The original oneday.js uses d3.layout.force() driven by d3.timer() at 30fps
+    // so the force runs indefinitely (forceSimulation's alpha decays and stops).
+    // We mirror that exactly: a separate "render ticker" running at 30fps that
+    // pulls each node toward its current focus + per-node ring offset, then
+    // resolves collisions. The day ticker (SPEEDS[USER_SPEED]) is independent
+    // and only changes which focus a node is pulled toward.
+    // (Replaces the earlier d3.forceSimulation(...) which died after alphaMin.)
+    sim = { running: true };
+    renderTimer = setInterval(() => { simTick({ alpha: 0.5 }); }, 33);
 
     // Circles
     const circle = svg.append("g")
@@ -311,10 +313,13 @@
   function simTick(e) {
     // Port of oneday.js tick() (lines 478–506): pull each node toward its
     // current activity focus + per-node offset, then resolve collisions.
-    // The reference uses k = 0.04 * e.alpha, which gives fast early motion
-    // then slow settle — leaves room for collide() to spread nodes around
-    // the focus. We adopt the same pattern.
-    const k = 0.04 * (e && e.alpha != null ? e.alpha : 1);
+    // The reference uses k = 0.04 * e.alpha — but we drive the tick from a
+    // setInterval (not a forceSimulation), so there's no decaying alpha.
+    // We use a fixed k = 0.15 which is fast enough to track a mid-snap that
+    // dayTick() did, but slow enough that collide() can still spread the
+    // 1000 dots into a ring around each dept focus rather than collapsing them
+    // to a single pixel.
+    const k = 0.15;
     for (let i = 0; i < NODES.length; i++) {
       const o = NODES[i];
       const focus = FOCI.find(f => f.code === o.act);
@@ -377,6 +382,7 @@
         nd.act = step.dept;
         nd.nextMoveDay = step.startOffset + step.duration;
         // Snap node to the new dept's rim cloud — matches oneday.js lines 436–437.
+        // The 30fps renderTimer (above) then pulls it to its final orbit position.
         const focus = FOCI.find(f => f.code === nd.act);
         if (focus) {
           nd.x = focus.x + nd.offsetX;
@@ -385,12 +391,8 @@
         stepped = true;
       }
     }
-
-    // Reheat the simulation so nodes that changed dept actually orbit toward their new focus
-    // (matches oneday.js timer() line 443 force.resume()).
-    if (stepped && sim) {
-      sim.alpha(0.3).restart();
-    }
+    // (The old sim.alpha().restart() is gone — renderTimer runs continuously
+    // and pulls nodes toward whichever focus they're at now.)
 
     // Recompute concentration
     for (const d of DEPTS) { valueByDept[d.code] = 0; countByDept[d.code] = 0; }
@@ -422,7 +424,10 @@
 
     if (!pause) {
       currDay = (currDay + 1) % 30;
-      setTimeout(dayTick, SPEEDS[USER_SPEED]);
+      dayTimer = setTimeout(dayTick, SPEEDS[USER_SPEED]);
+    } else if (dayTimer) {
+      clearTimeout(dayTimer);
+      dayTimer = null;
     }
   }
 
@@ -602,6 +607,7 @@
   }
   function reset() {
     pause = true;
+    if (dayTimer) { clearTimeout(dayTimer); dayTimer = null; }
     currDay = 0;
     d3.select("#sim-play").style("display", "initial");
     d3.select("#sim-pause").style("display", "none");
@@ -613,8 +619,8 @@
       nd.act = firstStep.dept;
       nd.nextMoveDay = firstStep.startOffset + firstStep.duration;
       const focus = FOCI.find(f => f.code === firstStep.dept);
-      nd.x = focus.x + (Math.random() - 0.5) * 4;
-      nd.y = focus.y + (Math.random() - 0.5) * 4;
+      nd.x = focus.x + nd.offsetX;
+      nd.y = focus.y + nd.offsetY;
     }
     for (const d of DEPTS) { valueByDept[d.code] = 0; countByDept[d.code] = 0; }
     dayTick();
